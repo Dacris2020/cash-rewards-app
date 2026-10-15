@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CashRewards - Gana Dinero Real</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- SDK NATIVO DE MONETAG -->
+  <script src='//libtl.com/sdk.js' data-zone='12036204' data-sdk='show_12036204'></script>
+
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #ffffff;
+      --accent: #f1c40f;
+      --purple: #8e44ad;
+      --tiktok: #fe2c55;
+      --offerwall: #e67e22;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .header {
+      width: 100%;
+      background: linear-gradient(135deg, #059669, #10b981);
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      box-sizing: border-box;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .header h1 { margin: 0; font-size: 20px; color: #fff; }
+    .balance-card {
+      background-color: var(--card-bg);
+      width: 100%;
+      margin-top: 15px;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-sizing: border-box;
+    }
+    .balance { font-size: 22px; font-weight: bold; color: var(--primary); }
+    .btn-action {
+      background-color: var(--primary);
+      color: #000;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    .btn-tiktok { background-color: var(--tiktok); color: #fff; }
+    .btn-offerwall { background-color: var(--offerwall); color: #fff; }
+    .btn-purple { background-color: var(--purple); color: #fff; }
+    .btn-redeem { background-color: var(--accent); color: #000; }
+    .section { width: 100%; margin-top: 20px; }
+    .card-box {
+      background-color: var(--card-bg);
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 10px;
+    }
+    .offerwall-iframe {
+      width: 100%;
+      height: 500px;
+      border: none;
+      border-radius: 8px;
+      margin-top: 10px;
+      background: #0f172a;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>💵 CashRewards App</h1>
+    <p style="font-size: 12px; margin-top: 5px;">¡Completa tareas y retira dinero real!</p>
+  </div>
+
+  <div class="balance-card">
+    <span>Tu Saldo:</span>
+    <span class="balance" id="pointsDisplay">0 Pts ($0.00)</span>
+  </div>
+
+  <!-- SECCIÓN MISIONES Y REDES -->
+  <div class="section">
+    <h3>🚀 Tareas Rápidas</h3>
+    <button class="btn-action btn-tiktok" onclick="followTikTok()">🎵 Seguir en TikTok @sungodml (+30 Pts)</button>
+    <button class="btn-action" onclick="watchAd()">📺 Ver Anuncio (+10 Pts)</button>
+    <button class="btn-action" style="background:#3b82f6; color:#fff;" onclick="dailyReward()">🎁 Bono Diario (+5 Pts)</button>
+  </div>
+
+  <!-- SECCIÓN MURO DE OFERTAS CPAGRIP -->
+  <div class="section">
+    <h3>🔥 Tareas de Alto Valor (CPAGrip)</h3>
+    <div class="card-box" style="text-align: center;">
+      <p style="font-size: 13px; margin: 0 0 10px 0;">¡Gana cientos de puntos probando apps y encuestas!</p>
+      <button class="btn-action btn-offerwall" onclick="openOfferwall()">📋 Abrir Muro de Ofertas</button>
+      
+      <div id="offerwall-box" style="display: none; margin-top: 10px;">
+        <iframe id="offerwall-frame" class="offerwall-iframe" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN RULETA -->
+  <div class="section">
+    <h3>🎡 Ruleta de Dinero</h3>
+    <div class="card-box" style="text-align: center;">
+      <p style="font-size: 13px; margin: 0 0 10px 0;">¡Gira y gana hasta 50 puntos al instante!</p>
+      <button class="btn-action btn-purple" onclick="spinWheel()">🎰 Girar Ruleta</button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN REFERIDOS -->
+  <div class="section">
+    <h3>👥 Sistema de Referidos</h3>
+    <div class="card-box" style="text-align: center;">
+      <p style="font-size: 13px; margin: 0 0 10px 0;">Recibe +20 Pts por cada amigo que ingrese a la app.</p>
+      <button class="btn-action" style="background: #10b981; color: #fff;" onclick="shareInviteLink()">📩 Invitar Amigos</button>
+    </div>
+  </div>
+
+  <!-- SECCIÓN RETIRO DE DINERO -->
+  <div class="section">
+    <h3>💳 Solicitar Retiro</h3>
+    <button class="btn-action btn-redeem" onclick="redeem(1000, '$1.00 USD (PayPal)')">💵 $1.00 USD PayPal (1,000 Pts)</button>
+    <button class="btn-action btn-redeem" style="margin-top: 8px;" onclick="redeem(5000, '$5.00 USD (PayPal / Nequi)')">💵 $5.00 USD PayPal / Nequi (5,000 Pts)</button>
+  </div>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    // --- CONFIGURACIÓN PRINCIPAL ---
+    const BOT_TOKEN = "PEGA_AQUI_EL_NUEVO_BOT_TOKEN"; 
+    const ADMIN_CHAT_ID = "6129588092"; 
+
+    let points = parseInt(localStorage.getItem('cashPoints')) || 0;
+    updateDisplay();
+
+    function updateDisplay() {
+      const usdValue = (points / 1000).toFixed(2);
+      document.getElementById('pointsDisplay').innerText = `${points} Pts ($${usdValue})`;
+      localStorage.setItem('cashPoints', points);
+    }
+
+    // --- ANUNCIOS MONETAG ---
+    function watchAd() {
+      if (typeof show_12036204 === 'function') {
+        show_12036204().then(() => {
+          points += 10;
+          updateDisplay();
+          alert("¡Anuncio completado! Has recibido +10 Pts.");
+        }).catch(e => {
+          alert("No hay anuncios disponibles por el momento.");
+        });
+      } else {
+        alert("Cargando sistema de anuncios... Reintenta en breve.");
+      }
+    }
+
+    // --- RULETA ---
+    function spinWheel() {
+      const lastSpin = localStorage.getItem('lastSpinDateCash');
+      const today = new Date().toDateString();
+
+      if (lastSpin === today) {
+        alert("Ya giraste la ruleta hoy. ¡Regresa mañana!");
+        return;
+      }
+
+      if (typeof show_12036204 === 'function') {
+        show_12036204().then(() => {
+          const prizes = [5, 10, 15, 20, 25, 50];
+          const prizeWon = prizes[Math.floor(Math.random() * prizes.length)];
+
+          points += prizeWon;
+          localStorage.setItem('lastSpinDateCash', today);
+          updateDisplay();
+          alert(`🎉 ¡Ganaste +${prizeWon} Pts!`);
+        }).catch(e => {
+          alert("Debes ver el anuncio completo para girar la ruleta.");
+        });
+      } else {
+        alert("Cargando anuncios...");
+      }
+    }
+
+    // --- CPAGRIP OFFERWALL ---
+    function openOfferwall() {
+      const box = document.getElementById('offerwall-box');
+      const frame = document.getElementById('offerwall-frame');
+      
+      if (box.style.display === 'none') {
+        box.style.display = 'block';
+        frame.srcdoc = `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <style>
+                body { margin: 0; padding: 0; background: #0f172a; color: #fff; font-family: sans-serif; }
+              </style>
+            </head>
+            <body>
+              <script type="text/javascript" src="https://tundrafile.com/script_include.php?id=1918458"><\/script>
+            </body>
+          </html>
+        `;
+      } else {
+        box.style.display = 'none';
+      }
+    }
+
+    // --- TIKTOK ---
+    function followTikTok() {
+      const followed = localStorage.getItem('followedTikTokCash');
+      if (followed) {
+        alert("Ya reclamaste esta recompensa.");
+      } else {
+        tg.openLink("https://www.tiktok.com/@sungodml");
+        points += 30;
+        localStorage.setItem('followedTikTokCash', 'true');
+        updateDisplay();
+        alert("¡Gracias por seguir la cuenta! Te acreditamos +30 Pts.");
+      }
+    }
+
+    // --- BONO DIARIO ---
+    function dailyReward() {
+      const lastClaim = localStorage.getItem('lastClaimDateCash');
+      const today = new Date().toDateString();
+
+      if (lastClaim === today) {
+        alert("Ya reclamaste tu bono diario. ¡Vuelve mañana!");
+      } else {
+        points += 5;
+        localStorage.setItem('lastClaimDateCash', today);
+        updateDisplay();
+        alert("¡Bono diario acreditado (+5 Pts)!");
+      }
+    }
+
+    // --- REFERIDOS ---
+    function shareInviteLink() {
+      const inviteUrl = `https://t.me/share/url?url=https://t.me/TU_BOT_USERNAME/app&text=¡Gana%20dinero%20real%20por%20retirar%20a%20PayPal%20completando%20tareas!`;
+      tg.openTelegramLink(inviteUrl);
+    }
+
+    // --- RETIROS (ALERTA A TU TELEGRAM) ---
+    function redeem(cost, reward) {
+      if (points >= cost) {
+        const paymentAccount = prompt("Ingresa tu correo de PayPal o número de Nequi/Daviplata:");
+        if (paymentAccount) {
+          const user = tg.initDataUnsafe.user || {};
+          const username = user.username ? "@" + user.username : user.first_name || "Desconocido";
+
+          const text = `🚨 *SOLICITUD DE RETIRO DE DINERO*\n\n👤 **Usuario:** ${username}\n💵 **Monto:** ${reward}\n💳 **Cuenta:** \`${paymentAccount}\``;
+          
+          fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              chat_id: ADMIN_CHAT_ID,
+              text: text,
+              parse_mode: "Markdown"
+            })
+          });
+
+          points -= cost;
+          updateDisplay();
+          alert(`¡Solicitud enviada! Procesaremos tu pago en las próximas horas.`);
+        }
+      } else {
+        alert(`Necesitas al menos ${cost} Pts para retirar este paquete.`);
+      }
+    }
+  </script>
+</body>
+</html>
